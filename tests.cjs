@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');const L=require('./dist/engine.js');
+const base={mode:'straight',sumMin:0,sumMax:27,spanMin:0,spanMax:9,odd:'',big:'',shape:'',route:'',positions:Array.from({length:3},()=>Array.from({length:10},(_,i)=>i)),pool:Array.from({length:10},(_,i)=>i)};
+assert.equal(L.filter(base).length,1000);assert.equal(L.filter({...base,mode:'g3'}).length,90);assert.equal(L.filter({...base,mode:'g6'}).length,120);
+assert.equal(L.filter({...base,shape:'triple'}).length,10);assert.equal(L.filter({...base,shape:'pair'}).length,270);assert.equal(L.filter({...base,shape:'distinct'}).length,720);
+assert.equal(L.filter({...base,sumMin:13,sumMax:13}).length,75);assert.equal(L.filter({...base,sumMin:14,sumMax:14}).length,75);
+assert.equal(L.filter({...base,odd:'1'}).length,375);assert.equal(L.filter({...base,positions:[[0],[0],[7]]})[0].n,'007');
+assert.equal(L.filter({...base,include:[1],exclude:[1]}).length,0);assert.equal(L.filter({...base,spanMax:0}).length,10);
+assert.equal(L.filter({...base,mode:'g3',pool:[1,2]}).length,2);assert.equal(L.filter({...base,mode:'g6',pool:[1,2,3]}).length,1);
+assert.equal(L.filter({...base,route:'012'}).length,216);assert.equal(L.parseHistory('期号,号码\n2026001,007\n2026002,1,2,3')[0].n,'007');
+assert.throws(()=>L.parseHistory('1,123\n1,234'));assert.throws(()=>L.parseHistory('1,12'));assert.throws(()=>L.parseHistory('<script>,123'));
+const rows=L.parseHistory('1,001\n2,123');assert.equal(L.stats(rows)[0].count,2);assert.equal(L.stats(rows)[0].omission,1);assert.equal(L.stats(rows)[9].unseen,true);
+assert.equal(new Set(L.sample(L.universe,100).map(x=>x.n)).size,100);
+console.log('PASS: enumeration, group deduplication, coverage counts, filters, leading zeros, CSV validation, omission, random uniqueness');
